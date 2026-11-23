@@ -59,7 +59,6 @@
                 height: calc(100vh - 140px);
             }
             .logo { font-size: 1.5rem; }
-            :root { --cv-scale: 0.52; }
         }
 
         .preview-pane {
@@ -98,13 +97,11 @@
             display: flex;
             flex-direction: column;
             transform: scale(var(--cv-scale));
-            transform-origin: top center;
+            transform-origin: top left;
             flex-shrink: 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             position: relative;
             overflow: hidden;
-            
-            margin-bottom: calc(297mm * (var(--cv-scale) - 1) + 15px);
         }
         
         .page-number {
@@ -117,18 +114,6 @@
             font-weight: 600;
         }
 
-        @media (max-width: 480px) { 
-            :root { --cv-scale: 0.35; } 
-            .cv-page { margin-bottom: calc(297mm * (var(--cv-scale) - 1) + 10px); }
-        }
-        @media (min-width: 481px) and (max-width: 768px) { 
-            :root { --cv-scale: 0.45; } 
-            .cv-page { margin-bottom: calc(297mm * (var(--cv-scale) - 1) + 12px); }
-        }
-        @media (min-width: 769px) and (max-width: 1099px) { 
-            :root { --cv-scale: 0.65; } 
-            .cv-page { margin-bottom: calc(297mm * (var(--cv-scale) - 1) + 15px); }
-        }
 
         .form-card { 
             background: var(--editor-card); 
@@ -158,6 +143,9 @@
         .color-picker-item label { margin-bottom: 0; color: #92400e; font-size: 0.75rem; font-weight: 600; flex: 1; }
         .color-input { width: 40px; height: 30px; padding: 0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; }
 
+        .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin-bottom: 15px; }
+        .lang-option label { margin-bottom: 0; color: #166534; font-size: 0.75rem; font-weight: 600; text-transform: none; flex: 1; }
+        .lang-option select { width: auto; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; cursor: pointer; }
         .page-number-option { display: flex; align-items: center; gap: 10px; padding: 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; margin-bottom: 20px; }
         .page-number-option label { margin-bottom: 0; color: #0369a1; font-size: 0.75rem; font-weight: 600; text-transform: none; cursor: pointer; flex: 1; }
         .page-number-option input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
@@ -186,6 +174,41 @@
 
         #cropModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .crop-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 400px; text-align: center; }
+
+        /* ---------- Responsive ---------- */
+        .page-wrap { position: relative; width: calc(210mm * var(--cv-scale)); height: calc(297mm * var(--cv-scale)); margin-bottom: 15px; flex-shrink: 0; }
+        .page-wrap .cv-page { position: absolute; top: 0; left: 0; }
+        textarea { resize: vertical; }
+        .nav-flex { gap: 10px; }
+        .logo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .nav-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .mobile-tabs { display: none; }
+        .crop-content { max-height: 95vh; overflow-y: auto; }
+
+        @media (max-width: 1099px) {
+            .mobile-tabs { display: flex; gap: 8px; max-width: 1300px; margin: 0 auto; padding: 10px 15px 0; }
+            .tab-btn { flex: 1; justify-content: center; background: #f1f5f9; color: #334155; }
+            .tab-btn.active { background: #000; color: #fff; }
+            .tab-btn.tab-dl { flex: 0 0 auto; background: #000; color: #fff; }
+            .editor-container.show-edit .preview-pane { display: none; }
+            .editor-container.show-preview .form-card { display: none; }
+            header { padding: 10px 0; margin-bottom: 12px; }
+        }
+
+        @media (max-width: 768px) {
+            input, textarea { font-size: 16px; }
+            .btn { min-height: 44px; justify-content: center; }
+            .form-card { padding: 14px; }
+            .container { padding: 6px; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 1rem; }
+            .btn-label { display: none; }
+            .nav-actions .btn { padding: 10px 14px; }
+            .color-picker-group { grid-template-columns: 1fr; }
+            .preview-pane { padding: 12px 6px; border-radius: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -204,18 +227,31 @@
 <header>
     <div class="nav-flex container">
         <div class="logo"><i class="fas fa-file-invoice"></i> Cat CV Generator (CCG)</div>
-        <div>
-            <button onclick="clearAllData()" class="btn" style="background: #f1f5f9; margin-right: 10px;"><i class="fas fa-trash"></i> Hapus Data</button>
-            <button onclick="window.location.reload()" class="btn"><i class="fas fa-sync"></i> Reset</button>
+        <div class="nav-actions">
+            <button onclick="clearAllData()" class="btn" style="background: #f1f5f9;" title="Hapus Data"><i class="fas fa-trash"></i> <span class="btn-label">Hapus Data</span></button>
+            <button onclick="window.location.reload()" class="btn" title="Reset"><i class="fas fa-sync"></i> <span class="btn-label">Reset</span></button>
         </div>
+    </div>
+    <div class="mobile-tabs">
+        <button class="btn tab-btn active" data-tab="edit" onclick="setTab('edit')"><i class="fas fa-pen"></i> Edit</button>
+        <button class="btn tab-btn" data-tab="preview" onclick="setTab('preview')"><i class="fas fa-eye"></i> Preview</button>
+        <button class="btn tab-btn tab-dl" onclick="exportPDF()" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
     </div>
 </header>
 
 <main class="container">
-    <div class="editor-container">
+    <div class="editor-container show-edit">
         <div class="form-card">
             <button id="exportBtn" class="btn btn-success"><i class="fas fa-file-pdf"></i> DOWNLOAD PDF</button>
             
+            <div class="lang-option">
+                <label for="cvLang"><i class="fas fa-language"></i> Bahasa CV / CV Language</label>
+                <select id="cvLang" onchange="changeLang()">
+                    <option value="id">Indonesia</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
             <div class="page-number-option">
                 <label for="showPageNumber">
                     <i class="fas fa-file-alt"></i> Tampilkan Nomor Halaman
@@ -303,6 +339,41 @@
     let currentPhoto = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
     let autoSaveTimeout;
     let showPageNumbers = false;
+    let cvLang = 'id';
+
+    const I18N = {
+        id: { page: 'Halaman', name: 'NAMA LENGKAP', title: 'Judul Profesional', profile: 'Profil', education: 'Pendidikan', experience: 'Pengalaman Kerja', skills: 'Keahlian', certs: 'Sertifikat dan Prestasi' },
+        en: { page: 'Page', name: 'FULL NAME', title: 'Professional Title', profile: 'Profile', education: 'Education', experience: 'Work Experience', skills: 'Skills', certs: 'Certifications and Achievements' }
+    };
+    function t(k) { return I18N[cvLang][k]; }
+
+    function changeLang() {
+        cvLang = document.getElementById('cvLang').value;
+        sync(); saveData();
+    }
+
+    let lastScale = 0;
+    function updateScale() {
+        const pane = document.querySelector('.preview-pane');
+        const w = pane.clientWidth;
+        if (!w) return; // pane hidden (mobile "Edit" tab)
+        const cs = getComputedStyle(pane);
+        const avail = w - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const pageW = 210 / 25.4 * 96; // A4 width in px
+        const scale = Math.max(0.2, Math.min(1, avail / pageW));
+        if (Math.abs(scale - lastScale) < 0.001) return;
+        lastScale = scale;
+        document.documentElement.style.setProperty('--cv-scale', scale.toFixed(4));
+    }
+
+    function setTab(tab) {
+        const ec = document.querySelector('.editor-container');
+        ec.classList.toggle('show-edit', tab === 'edit');
+        ec.classList.toggle('show-preview', tab === 'preview');
+        document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        updateScale();
+        window.scrollTo(0, 0);
+    }
 
     function handleInput() {
         sync();
@@ -332,6 +403,7 @@
             inColor: document.getElementById('inColor').value,
             inTitleColor: document.getElementById('inTitleColor').value,
             showPageNumbers: showPageNumbers,
+            cvLang: cvLang,
             currentPhoto: currentPhoto,
             eduItems: [], expItems: [], skillItems: [], certItems: [],
             counter: counter
@@ -357,6 +429,8 @@
                 if (el && key.startsWith('in')) el.value = data[key];
             });
             showPageNumbers = data.showPageNumbers || false;
+            cvLang = data.cvLang === 'en' ? 'en' : 'id';
+            document.getElementById('cvLang').value = cvLang;
             document.getElementById('showPageNumber').checked = showPageNumbers;
             currentPhoto = data.currentPhoto || currentPhoto;
             counter = data.counter || counter;
@@ -441,7 +515,7 @@
             const sectionHeight = estimateHeight(section);
             if (currentHeight + sectionHeight > maxPageHeight && currentHeight > 0) {
                 if (showPageNumbers) addPageNumber(currentPage, previewContainer.children.length + 1);
-                previewContainer.appendChild(currentPage);
+                appendPage(previewContainer, currentPage);
                 currentPage = createPage(previewContainer.children.length + 1);
                 currentHeight = 0;
             }
@@ -449,7 +523,14 @@
             currentHeight += sectionHeight;
         });
         if (showPageNumbers) addPageNumber(currentPage, previewContainer.children.length + 1);
-        previewContainer.appendChild(currentPage);
+        appendPage(previewContainer, currentPage);
+    }
+
+    function appendPage(container, page) {
+        const wrap = document.createElement('div');
+        wrap.className = 'page-wrap';
+        wrap.appendChild(page);
+        container.appendChild(wrap);
     }
 
     function createPage(num) {
@@ -467,7 +548,7 @@
     function addPageNumber(page, num) {
         const p = document.createElement('div');
         p.className = 'page-number';
-        p.textContent = `Page ${num}`;
+        p.textContent = `${t('page')} ${num}`;
         page.appendChild(p);
     }
 
@@ -485,8 +566,8 @@
         const h = document.createElement('div'); h.className = 'cv-header';
         h.innerHTML = `<div class="cv-photo-box"><img src="${currentPhoto}"></div>
             <div class="cv-name-zone">
-                <h1>${document.getElementById('inNama').value || "NAMA LENGKAP"}</h1>
-                <p style="color:var(--accent-color)">${document.getElementById('inJudul').value || "Judul Profesional"}</p>
+                <h1>${document.getElementById('inNama').value || t('name')}</h1>
+                <p style="color:var(--accent-color)">${document.getElementById('inJudul').value || t('title')}</p>
                 <div class="cv-contact-grid">
                     <div style="display:flex;flex-direction:column;gap:3px"><div class="cv-contact-item"><i class="fas fa-envelope"></i> ${document.getElementById('inEmail').value || "-"}</div><div class="cv-contact-item"><i class="fas fa-birthday-cake"></i> ${document.getElementById('inTtl').value || "-"}</div></div>
                     <div style="display:flex;flex-direction:column;gap:3px"><div class="cv-contact-item"><i class="fas fa-phone"></i> ${document.getElementById('inTelp').value || "-"}</div><div class="cv-contact-item"><i class="fas fa-map-marker-alt"></i> ${document.getElementById('inAlamat').value || "-"}</div></div>
@@ -498,7 +579,7 @@
     function renderProfile() {
         const p = document.createElement('div'); const txt = document.getElementById('inProfil').value;
         if (!txt) return p;
-        p.innerHTML = `<div class="cv-sec-title">Profil</div><div class="cv-text">${txt}</div>`;
+        p.innerHTML = `<div class="cv-sec-title">${t('profile')}</div><div class="cv-text">${txt}</div>`;
         return p;
     }
 
@@ -508,7 +589,7 @@
             const t = box.querySelector('.i-title').value, s = box.querySelector('.i-sub').value, d = box.querySelector('.i-date').value;
             if(t||s||d) html += `<div class="cv-entry"><div class="cv-entry-head"><span class="cv-company">${t}</span><span class="cv-year">${d}</span></div><span class="cv-entry-posisi">${s}</span></div>`;
         });
-        if (html) c.innerHTML = `<div class="cv-sec-title">Pendidikan</div>${html}`;
+        if (html) c.innerHTML = `<div class="cv-sec-title">${t('education')}</div>${html}`;
         return c;
     }
 
@@ -518,7 +599,7 @@
             const t = box.querySelector('.i-title').value, s = box.querySelector('.i-sub').value, d = box.querySelector('.i-date').value, desc = box.querySelector('.i-desc')?.value;
             if(t||s||d) html += `<div class="cv-entry"><div class="cv-entry-head"><span class="cv-company">• ${t}</span><span class="cv-year">${d}</span></div><span class="cv-entry-posisi">${s}</span><div class="cv-entry-desc">${desc||''}</div></div>`;
         });
-        if (html) c.innerHTML = `<div class="cv-sec-title">Pengalaman Kerja</div>${html}`;
+        if (html) c.innerHTML = `<div class="cv-sec-title">${t('experience')}</div>${html}`;
         return c;
     }
 
@@ -526,7 +607,7 @@
         const c = document.createElement('div'); let sk = [];
         document.querySelectorAll('#skillList .skill-input').forEach(i => { if (i.value.trim()) sk.push(i.value.trim()); });
         if (!sk.length) return c;
-        c.innerHTML = `<div class="cv-sec-title">Keahlian</div><div class="badge-list">${sk.map(s => `<span class="cv-badge">${s}</span>`).join('')}</div>`;
+        c.innerHTML = `<div class="cv-sec-title">${t('skills')}</div><div class="badge-list">${sk.map(s => `<span class="cv-badge">${s}</span>`).join('')}</div>`;
         return c;
     }
 
@@ -534,7 +615,7 @@
         const c = document.createElement('div'); let cr = [];
         document.querySelectorAll('#certList .cert-input').forEach(i => { if (i.value.trim()) cr.push(i.value.trim()); });
         if (!cr.length) return c;
-        c.innerHTML = `<div class="cv-sec-title">Sertifikat dan Prestasi</div><div style="font-size:9.5pt;line-height:1.5">${cr.map(x => `<div style="display:flex"><div style="width:12px">•</div><div>${x}</div></div>`).join('')}</div>`;
+        c.innerHTML = `<div class="cv-sec-title">${t('certs')}</div><div style="font-size:9.5pt;line-height:1.5">${cr.map(x => `<div style="display:flex"><div style="width:12px">•</div><div>${x}</div></div>`).join('')}</div>`;
         return c;
     }
 
@@ -546,28 +627,33 @@
         return c;
     }
 
-    document.getElementById('exportBtn').addEventListener('click', () => {
+    function exportPDF() {
         const pages = document.querySelectorAll('#previewContainer .cv-page');
+        if (!pages.length) return;
         const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        const stage = document.createElement('div');
+        stage.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;';
+        document.body.appendChild(stage);
+        const finish = () => { if (stage.parentNode) document.body.removeChild(stage); };
         const generatePDF = (i) => {
-            if (i >= pages.length) { pdf.save("CV_Official.pdf"); return; }
-            const page = pages[i];
-            const originalScale = document.documentElement.style.getPropertyValue('--cv-scale');
-            const originalMargin = page.style.marginBottom;
-            page.style.transform = 'none'; page.style.marginBottom = '0';
-            html2canvas(page, { scale: 3, useCORS: true, logging: false }).then(canvas => {
+            if (i >= pages.length) { finish(); pdf.save("CV_Official.pdf"); return; }
+            const clone = pages[i].cloneNode(true);
+            clone.style.transform = 'none'; clone.style.position = 'relative'; clone.style.margin = '0';
+            stage.innerHTML = ''; stage.appendChild(clone);
+            html2canvas(clone, { scale: 3, useCORS: true, logging: false }).then(canvas => {
                 const img = canvas.toDataURL('image/jpeg', 0.95);
                 if (i > 0) pdf.addPage();
                 pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
-                page.style.transform = `scale(${originalScale || '0.55'})`;
-                page.style.marginBottom = originalMargin;
                 generatePDF(i + 1);
-            });
+            }).catch(err => { finish(); console.error(err); });
         };
         generatePDF(0);
-    });
+    }
+    document.getElementById('exportBtn').addEventListener('click', exportPDF);
 
-    window.onload = () => { if (!loadData()) { addItem('eduList'); addItem('expList'); addSkillItem(); addCertItem(); } sync(); window.addEventListener('beforeunload', saveData); };
+    window.onload = () => { if (!loadData()) { addItem('eduList'); addItem('expList'); addSkillItem(); addCertItem(); } updateScale(); sync(); window.addEventListener('beforeunload', saveData);
+        window.addEventListener('resize', updateScale);
+        if (window.ResizeObserver) new ResizeObserver(updateScale).observe(document.querySelector('.preview-pane')); };
 </script>
 </body>
 </html>
